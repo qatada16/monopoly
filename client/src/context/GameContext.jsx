@@ -4,6 +4,7 @@ import { ref, set, onValue, remove } from 'firebase/database';
 
 const GameContext = createContext();
 const GAME_REF = 'currentGame';
+const NOTIF_REF = 'notifications';
 
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -13,7 +14,8 @@ export function GameProvider({ children }) {
   const [gameState, setGameState] = useState(null);
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState([]);
-  const skipNextSync = useRef(false);
+  const shownNotifs = useRef(new Set());
+  const initialLoad = useRef(true);
 
   const addToast = useCallback((message, type = 'success') => {
     const id = Date.now() + Math.random();
@@ -23,12 +25,28 @@ export function GameProvider({ children }) {
     }, 3000);
   }, []);
 
-  // Listen to Firebase in real-time — every device gets updates instantly
+  // Broadcast a notification to all devices via Firebase
+  const broadcastNotification = useCallback(async (message, type = 'success') => {
+    const notifRef = ref(db, NOTIF_REF);
+    const id = generateId();
+    const notif = { id, message, type, timestamp: Date.now() };
+    // Read existing, append new, clean up old (>10s)
+    const snap = await new Promise(resolve => onValue(ref(db, NOTIF_REF), resolve, { onlyOnce: true }));
+    const existing = snap.val() || {};
+    const now = Date.now();
+    const cleaned = {};
+    Object.entries(existing).forEach(([k, v]) => {
+      if (now - v.timestamp < 10000) cleaned[k] = v;
+    });
+    cleaned[id] = notif;
+    await set(notifRef, cleaned);
+  }, []);
+
+  // Listen to game state
   useEffect(() => {
     const gameRef = ref(db, GAME_REF);
     const unsubscribe = onValue(gameRef, (snapshot) => {
       const data = snapshot.val();
-      // Firebase stores arrays as objects — convert players back to array
       if (data && data.players) {
         data.players = Object.values(data.players).map(p => ({
           ...p,
@@ -41,6 +59,30 @@ export function GameProvider({ children }) {
 
     return () => unsubscribe();
   }, []);
+
+  // Listen to notifications — show toasts on all devices
+  useEffect(() => {
+    const notifRef = ref(db, NOTIF_REF);
+    const unsubscribe = onValue(notifRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+      const notifs = Object.values(data);
+      if (initialLoad.current) {
+        // First load: mark all existing as seen, don't show them
+        notifs.forEach(n => shownNotifs.current.add(n.id));
+        initialLoad.current = false;
+        return;
+      }
+      notifs.forEach(n => {
+        if (!shownNotifs.current.has(n.id)) {
+          shownNotifs.current.add(n.id);
+          addToast(n.message, n.type);
+        }
+      });
+    });
+
+    return () => unsubscribe();
+  }, [addToast]);
 
   // Write game state to Firebase
   const persistGame = useCallback(async (state) => {
@@ -87,9 +129,9 @@ export function GameProvider({ children }) {
     };
 
     await persistGame(state);
-    addToast('Game started!');
+    broadcastNotification('Game started!');
     return { success: true };
-  }, [addToast, persistGame]);
+  }, [addToast, broadcastNotification, persistGame]);
 
   const transferMoney = useCallback(async (senderId, recipientId, amount) => {
     const prev = gameState;
@@ -112,9 +154,9 @@ export function GameProvider({ children }) {
     recipient.transactions.push({ type: 'transfer_in', from: sender.name, amount, timestamp });
 
     await persistGame(state);
-    addToast(`${sender.name} paid $${amount} to ${recipient.name}`);
+    broadcastNotification(`${sender.name} paid $${amount} to ${recipient.name}`);
     return { success: true };
-  }, [gameState, addToast, persistGame]);
+  }, [gameState, addToast, broadcastNotification, persistGame]);
 
   const takeLoan = useCallback(async (playerId, amount) => {
     const prev = gameState;
@@ -135,9 +177,9 @@ export function GameProvider({ children }) {
     player.transactions.push({ type: 'loan_taken', amount, timestamp: new Date().toISOString() });
 
     await persistGame(state);
-    addToast(`${player.name} took a $${amount} loan`);
+    broadcastNotification(`${player.name} took a $${amount} loan`);
     return { success: true };
-  }, [gameState, addToast, persistGame]);
+  }, [gameState, addToast, broadcastNotification, persistGame]);
 
   const repayLoan = useCallback(async (playerId, amount) => {
     const prev = gameState;
@@ -158,23 +200,23 @@ export function GameProvider({ children }) {
     player.transactions.push({ type: 'loan_repaid', amount, timestamp: new Date().toISOString() });
 
     await persistGame(state);
-    addToast(`${player.name} repaid $${amount}`);
+    broadcastNotification(`${player.name} repaid $${amount}`);
     return { success: true };
-  }, [gameState, addToast, persistGame]);
+  }, [gameState, addToast, broadcastNotification, persistGame]);
 
   const endGame = useCallback(async () => {
     if (!gameState) return { success: false };
     const state = { ...gameState, gameActive: false, lastUpdated: new Date().toISOString() };
     await persistGame(state);
-    addToast('Game ended!', 'info');
+    broadcastNotification('Game ended!', 'info');
     return { success: true };
-  }, [gameState, addToast, persistGame]);
+  }, [gameState, addToast, broadcastNotification, persistGame]);
 
   const restartGame = useCallback(async () => {
     await persistGame(null);
-    addToast('Game cleared! Start a new one.', 'info');
+    broadcastNotification('Game cleared! Start a new one.', 'info');
     return { success: true };
-  }, [addToast, persistGame]);
+  }, [addToast, broadcastNotification, persistGame]);
 
   return (
     <GameContext.Provider value={{
