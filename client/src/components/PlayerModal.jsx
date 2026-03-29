@@ -117,7 +117,7 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
 
         {/* Action form */}
         {action && (
-          <div className="action-form">
+          <form className="action-form" onSubmit={e => { e.preventDefault(); handleAction(); }}>
             {action === 'transfer' && (
               <div className="form-section">
                 <label className="form-label">Recipient</label>
@@ -151,13 +151,13 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
               </span>
             </div>
             <button
+              type="submit"
               className="btn btn-primary"
-              onClick={handleAction}
               disabled={loading || !amount || Number(amount) <= 0 || (action === 'transfer' && !recipientId)}
             >
               {loading ? <span className="spinner" /> : 'Confirm'}
             </button>
-          </div>
+          </form>
         )}
 
         {/* Transactions */}
