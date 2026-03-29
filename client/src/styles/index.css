@@ -555,12 +555,12 @@ body {
 .bank-card {
   background: var(--bank-gradient);
   border-color: var(--accent);
-  cursor: default;
+  cursor: pointer;
 }
 
 .bank-card:hover {
   transform: translateY(-4px);
-  cursor: default;
+  cursor: pointer;
 }
 
 .card-header {
@@ -712,6 +712,39 @@ body {
 }
 
 .loans-out {
+  color: var(--warning);
+}
+
+/* ========== Bank Loan Breakdown ========== */
+.bank-loan-breakdown {
+  margin-bottom: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.loan-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.loan-breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--input-bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.loan-breakdown-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.loan-breakdown-amount {
+  font-weight: 700;
   color: var(--warning);
 }
 

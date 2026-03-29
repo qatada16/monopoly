@@ -218,10 +218,49 @@ export function GameProvider({ children }) {
     return { success: true };
   }, [addToast, broadcastNotification, persistGame]);
 
+  const payBank = useCallback(async (playerId, amount) => {
+    const prev = gameState;
+    if (!prev || !prev.gameActive) { addToast('No active game', 'error'); return { success: false }; }
+    amount = Number(amount);
+    if (!amount || amount <= 0) { addToast('Invalid amount', 'error'); return { success: false }; }
+
+    const state = JSON.parse(JSON.stringify(prev));
+    const player = state.players.find(p => p.id === playerId);
+    if (!player) { addToast('Player not found', 'error'); return { success: false }; }
+    if (player.balance < amount) { addToast('Insufficient balance', 'error'); return { success: false }; }
+
+    player.balance -= amount;
+    player.transactions.push({ type: 'paid_bank', amount, timestamp: new Date().toISOString() });
+
+    await persistGame(state);
+    broadcastNotification(`${player.name} paid $${amount} to the Bank`);
+    return { success: true };
+  }, [gameState, addToast, broadcastNotification, persistGame]);
+
+  const bankPayPlayer = useCallback(async (playerId, amount) => {
+    const prev = gameState;
+    if (!prev || !prev.gameActive) { addToast('No active game', 'error'); return { success: false }; }
+    amount = Number(amount);
+    if (!amount || amount <= 0) { addToast('Invalid amount', 'error'); return { success: false }; }
+
+    const state = JSON.parse(JSON.stringify(prev));
+    const player = state.players.find(p => p.id === playerId);
+    if (!player) { addToast('Player not found', 'error'); return { success: false }; }
+
+    player.balance += amount;
+    state.bank.totalDistributed += amount;
+    player.transactions.push({ type: 'received_from_bank', amount, timestamp: new Date().toISOString() });
+
+    await persistGame(state);
+    broadcastNotification(`Bank paid $${amount} to ${player.name}`);
+    return { success: true };
+  }, [gameState, addToast, broadcastNotification, persistGame]);
+
   return (
     <GameContext.Provider value={{
       gameState, loading, toasts, addToast,
-      createGame, transferMoney, takeLoan, repayLoan, endGame, restartGame
+      createGame, transferMoney, takeLoan, repayLoan, endGame, restartGame,
+      payBank, bankPayPlayer
     }}>
       {children}
     </GameContext.Provider>

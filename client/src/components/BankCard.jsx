@@ -1,6 +1,6 @@
-export default function BankCard({ bank, config, playerCount }) {
+export default function BankCard({ bank, config, playerCount, onClick }) {
   return (
-    <div className="bank-card">
+    <div className="bank-card" onClick={onClick}>
       <div className="card-header">
         <div className="player-avatar bank-avatar">🏦</div>
         <h3 className="player-name">The Bank</h3>

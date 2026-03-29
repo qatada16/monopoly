@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 
 export default function PlayerModal({ player, allPlayers, onClose }) {
-  const { transferMoney, takeLoan, repayLoan } = useGame();
-  const [action, setAction] = useState(null); // 'transfer' | 'loan' | 'repay'
+  const { transferMoney, takeLoan, repayLoan, payBank } = useGame();
+  const [action, setAction] = useState(null); // 'transfer' | 'loan' | 'repay' | 'pay_bank'
   const [amount, setAmount] = useState('');
   const [recipientId, setRecipientId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,6 +23,8 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
       res = await takeLoan(player.id, amount);
     } else if (action === 'repay') {
       res = await repayLoan(player.id, amount);
+    } else if (action === 'pay_bank') {
+      res = await payBank(player.id, amount);
     }
 
     setLoading(false);
@@ -44,6 +46,8 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
       case 'transfer_in': return '↙️';
       case 'loan_taken': return '🏦';
       case 'loan_repaid': return '✅';
+      case 'paid_bank': return '🏠';
+      case 'received_from_bank': return '🎰';
       default: return '💰';
     }
   };
@@ -54,9 +58,17 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
       case 'transfer_in': return `Received $${tx.amount} from ${tx.from}`;
       case 'loan_taken': return `Took $${tx.amount} loan`;
       case 'loan_repaid': return `Repaid $${tx.amount} loan`;
+      case 'paid_bank': return `Paid $${tx.amount} to Bank`;
+      case 'received_from_bank': return `Received $${tx.amount} from Bank`;
       default: return '';
     }
   };
+
+  useEffect(() => {
+    const handleEsc = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -96,6 +108,12 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
             onClick={() => { setAction(action === 'transfer' ? null : 'transfer'); setAmount(''); setRecipientId(''); }}
           >
             💸 Transfer
+          </button>
+          <button
+            className={`btn btn-action ${action === 'pay_bank' ? 'active' : ''}`}
+            onClick={() => { setAction(action === 'pay_bank' ? null : 'pay_bank'); setAmount(''); }}
+          >
+            🏠 Pay Bank
           </button>
           {remainingLoan > 0 && (
             <button
@@ -139,6 +157,7 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
                 min="1"
                 max={
                   action === 'transfer' ? player.balance :
+                  action === 'pay_bank' ? player.balance :
                   action === 'loan' ? remainingLoan :
                   Math.min(player.loanTaken, player.balance)
                 }
@@ -146,6 +165,7 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
               />
               <span className="form-hint">
                 {action === 'transfer' && `Max: $${player.balance.toLocaleString()}`}
+                {action === 'pay_bank' && `Max: $${player.balance.toLocaleString()}`}
                 {action === 'loan' && `Max: $${remainingLoan.toLocaleString()}`}
                 {action === 'repay' && `Max: $${Math.min(player.loanTaken, player.balance).toLocaleString()}`}
               </span>
