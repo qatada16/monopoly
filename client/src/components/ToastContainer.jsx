@@ -9,7 +9,7 @@ export default function ToastContainer() {
         <div key={toast.id} className={`toast toast-${toast.type}`}>
           <div className="toast-content">
             <span className="toast-icon">
-              {toast.type === 'success' ? '✓' : toast.type === 'error' ? '✕' : 'ℹ'}
+              {toast.type === 'success' ? '✓' : toast.type === 'error' ? '✕' : toast.type === 'warning' ? '⚠' : 'ℹ'}
             </span>
             <span className="toast-message">{toast.message}</span>
           </div>

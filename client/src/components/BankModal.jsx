@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 
 export default function BankModal({ onClose }) {
-  const { gameState, takeLoan, bankPayPlayer } = useGame();
+  const { gameState, takeLoan, bankPayPlayer, broadcastNotification } = useGame();
   const [action, setAction] = useState(null); // 'give_loan' | 'pay_player'
   const [playerId, setPlayerId] = useState('');
   const [amount, setAmount] = useState('');
@@ -89,6 +89,13 @@ export default function BankModal({ onClose }) {
                 <div key={i} className="loan-breakdown-item">
                   <span className="loan-breakdown-name">{p.name}</span>
                   <span className="loan-breakdown-amount">${p.loanTaken.toLocaleString()} / ${p.maxLoan.toLocaleString()}</span>
+                  <button
+                    className="btn-notify"
+                    title={`Remind ${p.name} to repay`}
+                    onClick={() => broadcastNotification(`⚠️ ${p.name}, please repay your $${p.loanTaken.toLocaleString()} loan!`, 'warning')}
+                  >
+                    🔔
+                  </button>
                 </div>
               ))}
             </div>

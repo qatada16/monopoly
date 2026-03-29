@@ -260,7 +260,7 @@ export function GameProvider({ children }) {
     <GameContext.Provider value={{
       gameState, loading, toasts, addToast,
       createGame, transferMoney, takeLoan, repayLoan, endGame, restartGame,
-      payBank, bankPayPlayer
+      payBank, bankPayPlayer, broadcastNotification
     }}>
       {children}
     </GameContext.Provider>
