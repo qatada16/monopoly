@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { db } from '../firebase.js';
 import { ref, set, onValue, remove } from 'firebase/database';
+import { playNotificationSound, vibrateDevice } from '../sounds.js';
 
 const GameContext = createContext();
 const GAME_REF = 'currentGame';
@@ -20,6 +21,8 @@ export function GameProvider({ children }) {
   const addToast = useCallback((message, type = 'success') => {
     const id = Date.now() + Math.random();
     setToasts(prev => [...prev, { id, message, type }]);
+    playNotificationSound(type);
+    vibrateDevice(type);
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
     }, 3000);
