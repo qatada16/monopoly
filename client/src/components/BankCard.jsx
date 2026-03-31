@@ -1,6 +1,9 @@
-export default function BankCard({ bank, config, playerCount, onClick }) {
+export default function BankCard({ bank, config, playerCount, onClick, pendingRequests }) {
   return (
     <div className="bank-card" onClick={onClick}>
+      {pendingRequests > 0 && (
+        <span className="request-badge">{pendingRequests}</span>
+      )}
       <div className="card-header">
         <div className="player-avatar bank-avatar">🏦</div>
         <h3 className="player-name">The Bank</h3>

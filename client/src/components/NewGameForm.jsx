@@ -5,6 +5,7 @@ export default function NewGameForm() {
   const { createGame } = useGame();
   const [playerCount, setPlayerCount] = useState(2);
   const [playerNames, setPlayerNames] = useState(['', '']);
+  const [playerKeys, setPlayerKeys] = useState(['', '']);
   const [initialAmount, setInitialAmount] = useState(1500);
   const [maxLoan, setMaxLoan] = useState(1000);
   const [loading, setLoading] = useState(false);
@@ -13,6 +14,11 @@ export default function NewGameForm() {
     const c = Math.max(2, Math.min(8, Number(count)));
     setPlayerCount(c);
     setPlayerNames(prev => {
+      const arr = [...prev];
+      while (arr.length < c) arr.push('');
+      return arr.slice(0, c);
+    });
+    setPlayerKeys(prev => {
       const arr = [...prev];
       while (arr.length < c) arr.push('');
       return arr.slice(0, c);
@@ -27,13 +33,23 @@ export default function NewGameForm() {
     });
   };
 
+  const handleKeyChange = (index, value) => {
+    setPlayerKeys(prev => {
+      const arr = [...prev];
+      arr[index] = value;
+      return arr;
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const names = playerNames.map(n => n.trim()).filter(Boolean);
-    if (names.length < 2) return;
+    const keys = playerKeys.map(k => k.trim()).filter(Boolean);
+    if (names.length < 2 || keys.length !== names.length) return;
     setLoading(true);
     await createGame({
       playerNames: names,
+      playerKeys: keys,
       initialAmount: Number(initialAmount),
       maxLoanPerPlayer: Number(maxLoan)
     });
@@ -41,6 +57,7 @@ export default function NewGameForm() {
   };
 
   const allNamesFilled = playerNames.every(n => n.trim().length > 0);
+  const allKeysFilled = playerKeys.every(k => k.trim().length > 0);
 
   return (
     <div className="new-game-container">
@@ -61,18 +78,29 @@ export default function NewGameForm() {
           </div>
 
           <div className="form-section">
-            <label className="form-label">Player Names</label>
+            <label className="form-label">Player Names & Keys</label>
             <div className="player-names-grid">
               {playerNames.map((name, i) => (
-                <div key={i} className="player-name-input-wrapper">
-                  <span className="player-number">P{i + 1}</span>
+                <div key={i} className="player-entry">
+                  <div className="player-name-input-wrapper">
+                    <span className="player-number">P{i + 1}</span>
+                    <input
+                      type="text"
+                      className="input"
+                      placeholder={`Player ${i + 1}`}
+                      value={name}
+                      onChange={(e) => handleNameChange(i, e.target.value)}
+                      maxLength={20}
+                    />
+                  </div>
                   <input
-                    type="text"
-                    className="input"
-                    placeholder={`Player ${i + 1}`}
-                    value={name}
-                    onChange={(e) => handleNameChange(i, e.target.value)}
-                    maxLength={20}
+                    type="password"
+                    className="input key-input"
+                    placeholder="Secret key"
+                    value={playerKeys[i]}
+                    onChange={(e) => handleKeyChange(i, e.target.value)}
+                    maxLength={30}
+                    autoComplete="off"
                   />
                 </div>
               ))}
@@ -107,7 +135,7 @@ export default function NewGameForm() {
           <button
             type="submit"
             className="btn btn-primary btn-lg start-btn"
-            disabled={!allNamesFilled || loading}
+            disabled={!allNamesFilled || !allKeysFilled || loading}
           >
             {loading ? (
               <span className="spinner" />

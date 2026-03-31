@@ -2,7 +2,7 @@ import ThemeToggle from './ThemeToggle.jsx';
 import { useGame } from '../context/GameContext.jsx';
 
 export default function Header() {
-  const { gameState, endGame, restartGame } = useGame();
+  const { gameState, endGame, restartGame, currentPlayer, logout } = useGame();
 
   return (
     <header className="header">
@@ -14,6 +14,14 @@ export default function Header() {
       </div>
 
       <div className="header-right">
+        {currentPlayer && (
+          <div className="header-player-info">
+            <span className="header-player-name">👤 {currentPlayer.name}</span>
+            <button className="btn btn-outline btn-sm btn-logout" onClick={logout} title="Switch player">
+              🔓
+            </button>
+          </div>
+        )}
         {gameState?.gameActive && (
           <div className="header-actions">
             <button className="btn btn-outline btn-sm" onClick={restartGame}>

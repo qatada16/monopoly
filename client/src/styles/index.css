@@ -1299,3 +1299,168 @@ body {
   from { opacity: 0; transform: translateY(100%); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ===== Player Auth & New Elements ===== */
+
+/* Login Screen */
+.login-card {
+  max-width: 360px;
+}
+
+.login-card .form-section {
+  margin-bottom: 12px;
+}
+
+/* Player entry (name + key) in NewGameForm */
+.player-entry {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.player-entry .input {
+  flex: 1;
+}
+
+.key-input {
+  max-width: 140px;
+  font-family: monospace;
+  letter-spacing: 2px;
+}
+
+/* Locked player card (not current player) */
+.player-card-locked {
+  opacity: 0.55;
+  cursor: default;
+  pointer-events: none;
+}
+
+.player-card-locked:hover {
+  transform: none;
+  box-shadow: var(--card-shadow);
+  border-color: var(--border);
+}
+
+.lock-icon {
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+/* Request badge on BankCard */
+.request-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--danger);
+  color: #fff;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0 6px;
+  z-index: 2;
+  animation: badgePop 0.3s ease-out;
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* Pending requests section in BankModal */
+.pending-requests-section {
+  border-top: 2px dashed var(--accent);
+  padding-top: 12px;
+  margin-top: 8px;
+}
+
+.pending-request-item {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+.request-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.btn-approve, .btn-reject {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all var(--transition);
+}
+
+.btn-approve:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.btn-reject:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.btn-approve:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Header player info */
+.header-player-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  margin-right: 8px;
+}
+
+.header-player-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.btn-logout {
+  padding: 2px 6px !important;
+  min-width: auto;
+  font-size: 0.8rem;
+}
+
+/* Disabled action button (pending loan) */
+.btn-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== Responsive: new elements ===== */
+@media (max-width: 480px) {
+  .player-entry {
+    flex-direction: column;
+  }
+  
+  .key-input {
+    max-width: 100%;
+  }
+
+  .header-player-info {
+    padding: 2px 6px;
+    margin-right: 4px;
+  }
+
+  .header-player-name {
+    font-size: 0.75rem;
+  }
+}

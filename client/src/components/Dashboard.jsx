@@ -6,7 +6,7 @@ import BankModal from './BankModal.jsx';
 import { useGame } from '../context/GameContext.jsx';
 
 export default function Dashboard() {
-  const { gameState } = useGame();
+  const { gameState, currentPlayerId } = useGame();
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showBankModal, setShowBankModal] = useState(false);
 
@@ -20,11 +20,13 @@ export default function Dashboard() {
           config={gameState.config}
           playerCount={gameState.players.length}
           onClick={() => setShowBankModal(true)}
+          pendingRequests={(gameState.loanRequests || []).length}
         />
         {gameState.players.map(player => (
           <PlayerCard
             key={player.id}
             player={player}
+            isCurrentPlayer={player.id === currentPlayerId}
             onClick={() => setSelectedPlayer(player)}
           />
         ))}

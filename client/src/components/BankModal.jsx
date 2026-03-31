@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 
 export default function BankModal({ onClose }) {
-  const { gameState, takeLoan, bankPayPlayer, broadcastNotification } = useGame();
+  const { gameState, takeLoan, bankPayPlayer, broadcastNotification, currentPlayerId, approveLoanRequest, rejectLoanRequest } = useGame();
   const [action, setAction] = useState(null); // 'give_loan' | 'pay_player'
   const [playerId, setPlayerId] = useState('');
   const [amount, setAmount] = useState('');
@@ -102,6 +102,41 @@ export default function BankModal({ onClose }) {
           </div>
         )}
 
+        {/* Pending Loan Requests */}
+        {(gameState.loanRequests || []).length > 0 && (
+          <div className="bank-loan-breakdown pending-requests-section">
+            <h4 className="transactions-title">Pending Loan Requests</h4>
+            <div className="loan-breakdown-list">
+              {(gameState.loanRequests || []).map(req => {
+                const isSelf = req.playerId === currentPlayerId;
+                return (
+                  <div key={req.id} className="loan-breakdown-item pending-request-item">
+                    <span className="loan-breakdown-name">{req.playerName}</span>
+                    <span className="loan-breakdown-amount">${req.amount.toLocaleString()}</span>
+                    <div className="request-actions">
+                      <button
+                        className="btn-approve"
+                        title={isSelf ? "Can't approve your own request" : 'Approve'}
+                        disabled={isSelf}
+                        onClick={() => approveLoanRequest(req.id)}
+                      >
+                        ✅
+                      </button>
+                      <button
+                        className="btn-reject"
+                        title="Reject"
+                        onClick={() => rejectLoanRequest(req.id)}
+                      >
+                        ❌
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Bank Actions */}
         {gameState.gameActive && (
           <div className="modal-actions">
@@ -127,6 +162,7 @@ export default function BankModal({ onClose }) {
               <select className="input select" value={playerId} onChange={e => { setPlayerId(e.target.value); setAmount(''); }}>
                 <option value="">Select player...</option>
                 {players
+                  .filter(p => p.id !== currentPlayerId)
                   .filter(p => action !== 'give_loan' || (p.maxLoan - p.loanTaken) > 0)
                   .map(p => (
                     <option key={p.id} value={p.id}>{p.name}</option>

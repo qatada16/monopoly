@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 
 export default function PlayerModal({ player, allPlayers, onClose }) {
-  const { transferMoney, takeLoan, repayLoan, payBank } = useGame();
-  const [action, setAction] = useState(null); // 'transfer' | 'loan' | 'repay' | 'pay_bank'
+  const { transferMoney, requestLoan, repayLoan, payBank, gameState } = useGame();
+  const [action, setAction] = useState(null); // 'transfer' | 'request_loan' | 'repay' | 'pay_bank'
   const [amount, setAmount] = useState('');
   const [recipientId, setRecipientId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,8 +19,8 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
     if (action === 'transfer') {
       if (!recipientId) { setLoading(false); return; }
       res = await transferMoney(player.id, recipientId, amount);
-    } else if (action === 'loan') {
-      res = await takeLoan(player.id, amount);
+    } else if (action === 'request_loan') {
+      res = await requestLoan(player.id, amount);
     } else if (action === 'repay') {
       res = await repayLoan(player.id, amount);
     } else if (action === 'pay_bank') {
@@ -115,14 +115,19 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
           >
             🏠 Pay Bank
           </button>
-          {remainingLoan > 0 && (
-            <button
-              className={`btn btn-action ${action === 'loan' ? 'active' : ''}`}
-              onClick={() => { setAction(action === 'loan' ? null : 'loan'); setAmount(''); }}
-            >
-              🏦 Take Loan
-            </button>
-          )}
+          {remainingLoan > 0 && (() => {
+            const hasPending = (gameState?.loanRequests || []).some(r => r.playerId === player.id);
+            return (
+              <button
+                className={`btn btn-action ${action === 'request_loan' ? 'active' : ''}`}
+                onClick={() => { setAction(action === 'request_loan' ? null : 'request_loan'); setAmount(''); }}
+                disabled={hasPending}
+                title={hasPending ? 'You already have a pending request' : ''}
+              >
+                📋 {hasPending ? 'Loan Pending' : 'Request Loan'}
+              </button>
+            );
+          })()}
           {player.loanTaken > 0 && (
             <button
               className={`btn btn-action ${action === 'repay' ? 'active' : ''}`}
@@ -158,7 +163,7 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
                 max={
                   action === 'transfer' ? player.balance :
                   action === 'pay_bank' ? player.balance :
-                  action === 'loan' ? remainingLoan :
+                  action === 'request_loan' ? remainingLoan :
                   Math.min(player.loanTaken, player.balance)
                 }
                 placeholder="Enter amount"
@@ -166,7 +171,7 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
               <span className="form-hint">
                 {action === 'transfer' && `Max: $${player.balance.toLocaleString()}`}
                 {action === 'pay_bank' && `Max: $${player.balance.toLocaleString()}`}
-                {action === 'loan' && `Max: $${remainingLoan.toLocaleString()}`}
+                {action === 'request_loan' && `Max: $${remainingLoan.toLocaleString()}`}
                 {action === 'repay' && `Max: $${Math.min(player.loanTaken, player.balance).toLocaleString()}`}
               </span>
             </div>
