@@ -1314,8 +1314,12 @@ body {
 /* Player entry (name + key) in NewGameForm */
 .player-entry {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
 }
 
 .player-entry .input {
@@ -1323,27 +1327,45 @@ body {
 }
 
 .key-input {
-  max-width: 140px;
   font-family: monospace;
   letter-spacing: 2px;
 }
 
-/* Locked player card (not current player) */
-.player-card-locked {
-  opacity: 0.55;
-  cursor: default;
+/* CSS-based password masking (no character flash) */
+.secret-key-field {
+  -webkit-text-security: disc;
+  text-security: disc;
+}
+
+/* Current player's card highlight */
+.player-card-own {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent), var(--card-shadow);
+}
+
+.own-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent);
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* Modal readonly notice */
+.modal-readonly-notice {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.modal-actions-disabled {
+  opacity: 0.45;
   pointer-events: none;
-}
-
-.player-card-locked:hover {
-  transform: none;
-  box-shadow: var(--card-shadow);
-  border-color: var(--border);
-}
-
-.lock-icon {
-  font-size: 0.85rem;
-  opacity: 0.6;
 }
 
 /* Request badge on BankCard */
@@ -1447,14 +1469,6 @@ body {
 
 /* ===== Responsive: new elements ===== */
 @media (max-width: 480px) {
-  .player-entry {
-    flex-direction: column;
-  }
-  
-  .key-input {
-    max-width: 100%;
-  }
-
   .header-player-info {
     padding: 2px 6px;
     margin-right: 4px;

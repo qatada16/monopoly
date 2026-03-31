@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext.jsx';
 
-export default function PlayerModal({ player, allPlayers, onClose }) {
+export default function PlayerModal({ player, allPlayers, onClose, isOwner }) {
   const { transferMoney, requestLoan, repayLoan, payBank, gameState } = useGame();
   const [action, setAction] = useState(null); // 'transfer' | 'request_loan' | 'repay' | 'pay_bank'
   const [amount, setAmount] = useState('');
@@ -102,16 +102,21 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
         </div>
 
         {/* Action buttons */}
-        <div className="modal-actions">
+        {!isOwner && (
+          <p className="modal-readonly-notice">👁️ View only — this is not your account</p>
+        )}
+        <div className={`modal-actions ${!isOwner ? 'modal-actions-disabled' : ''}`}>
           <button
             className={`btn btn-action ${action === 'transfer' ? 'active' : ''}`}
             onClick={() => { setAction(action === 'transfer' ? null : 'transfer'); setAmount(''); setRecipientId(''); }}
+            disabled={!isOwner}
           >
             💸 Transfer
           </button>
           <button
             className={`btn btn-action ${action === 'pay_bank' ? 'active' : ''}`}
             onClick={() => { setAction(action === 'pay_bank' ? null : 'pay_bank'); setAmount(''); }}
+            disabled={!isOwner}
           >
             🏠 Pay Bank
           </button>
@@ -121,8 +126,8 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
               <button
                 className={`btn btn-action ${action === 'request_loan' ? 'active' : ''}`}
                 onClick={() => { setAction(action === 'request_loan' ? null : 'request_loan'); setAmount(''); }}
-                disabled={hasPending}
-                title={hasPending ? 'You already have a pending request' : ''}
+                disabled={!isOwner || hasPending}
+                title={!isOwner ? 'Not your account' : hasPending ? 'You already have a pending request' : ''}
               >
                 📋 {hasPending ? 'Loan Pending' : 'Request Loan'}
               </button>
@@ -132,6 +137,7 @@ export default function PlayerModal({ player, allPlayers, onClose }) {
             <button
               className={`btn btn-action ${action === 'repay' ? 'active' : ''}`}
               onClick={() => { setAction(action === 'repay' ? null : 'repay'); setAmount(''); }}
+              disabled={!isOwner}
             >
               ✅ Repay Loan
             </button>

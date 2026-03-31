@@ -37,6 +37,7 @@ export default function Dashboard() {
           player={gameState.players.find(p => p.id === selectedPlayer.id) || selectedPlayer}
           allPlayers={gameState.players}
           onClose={() => setSelectedPlayer(null)}
+          isOwner={selectedPlayer.id === currentPlayerId}
         />
       )}
 

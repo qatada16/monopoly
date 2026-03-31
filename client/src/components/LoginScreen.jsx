@@ -25,13 +25,16 @@ export default function LoginScreen() {
           <div className="form-section">
             <label className="form-label">Secret Key</label>
             <input
-              type="password"
-              className="input"
+              type="text"
+              className="input secret-key-field"
               placeholder="Enter your key..."
               value={key}
               onChange={(e) => setKey(e.target.value)}
               autoFocus
               autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
             />
           </div>
           <button

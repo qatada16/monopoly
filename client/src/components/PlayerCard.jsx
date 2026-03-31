@@ -15,10 +15,9 @@ export default function PlayerCard({ player, onClick, isCurrentPlayer }) {
   }, [player.balance]);
 
   const loanPercent = player.maxLoan > 0 ? (player.loanTaken / player.maxLoan) * 100 : 0;
-  const handleClick = isCurrentPlayer ? onClick : undefined;
 
   return (
-    <div className={`player-card ${flash ? `flash-${flash}` : ''} ${!isCurrentPlayer ? 'player-card-locked' : ''}`} onClick={handleClick} role={isCurrentPlayer ? 'button' : undefined} tabIndex={isCurrentPlayer ? 0 : -1} onKeyDown={e => isCurrentPlayer && e.key === 'Enter' && onClick()}>
+    <div className={`player-card ${flash ? `flash-${flash}` : ''} ${isCurrentPlayer ? 'player-card-own' : ''}`} onClick={onClick} role="button" tabIndex={0} onKeyDown={e => e.key === 'Enter' && onClick()}>
       <div className="card-header">
         <div className="player-avatar">
           {player.name.charAt(0).toUpperCase()}
@@ -50,11 +49,11 @@ export default function PlayerCard({ player, onClick, isCurrentPlayer }) {
           {player.transactions.length} transaction{player.transactions.length !== 1 ? 's' : ''}
         </span>
         {isCurrentPlayer ? (
+          <span className="own-badge">You</span>
+        ) : (
           <svg className="card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 18 15 12 9 6" />
           </svg>
-        ) : (
-          <span className="lock-icon">🔒</span>
         )}
       </div>
     </div>

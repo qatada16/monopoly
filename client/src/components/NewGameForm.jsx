@@ -94,13 +94,16 @@ export default function NewGameForm() {
                     />
                   </div>
                   <input
-                    type="password"
-                    className="input key-input"
-                    placeholder="Secret key"
+                    type="text"
+                    className="input key-input secret-key-field"
+                    placeholder={`Key for ${name.trim() || `Player ${i + 1}`}`}
                     value={playerKeys[i]}
                     onChange={(e) => handleKeyChange(i, e.target.value)}
                     maxLength={30}
                     autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck="false"
                   />
                 </div>
               ))}

@@ -111,8 +111,8 @@ export default function BankModal({ onClose }) {
                 const isSelf = req.playerId === currentPlayerId;
                 return (
                   <div key={req.id} className="loan-breakdown-item pending-request-item">
-                    <span className="loan-breakdown-name">{req.playerName}</span>
-                    <span className="loan-breakdown-amount">${req.amount.toLocaleString()}</span>
+                    <span className="loan-breakdown-name">{req.playerName} </span>
+                    <span className="loan-breakdown-amount"> ${req.amount.toLocaleString()}</span>
                     <div className="request-actions">
                       <button
                         className="btn-approve"
