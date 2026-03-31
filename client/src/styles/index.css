@@ -364,6 +364,122 @@ body {
   padding-right: 40px;
 }
 
+/* ========== Custom Dropdown ========== */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.custom-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  min-height: 44px;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-align: left;
+}
+
+.custom-dropdown-trigger:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.custom-dropdown-open .custom-dropdown-trigger {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.custom-dropdown-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-dropdown-placeholder {
+  color: var(--text-muted);
+}
+
+.custom-dropdown-chevron {
+  flex-shrink: 0;
+  margin-left: 8px;
+  color: var(--text-muted);
+  transition: transform var(--transition);
+}
+
+.custom-dropdown-open .custom-dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.custom-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--card-bg, var(--bg-primary));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+  animation: dropdownSlide 0.15s ease-out;
+}
+
+@keyframes dropdownSlide {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.custom-dropdown-option {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.custom-dropdown-option:hover {
+  background: var(--bg-secondary);
+}
+
+.custom-dropdown-option-selected {
+  color: var(--accent);
+  font-weight: 600;
+  background: var(--accent-glow);
+}
+
+.custom-dropdown-option-selected:hover {
+  background: var(--accent-glow);
+}
+
+.custom-dropdown-option + .custom-dropdown-option {
+  border-top: 1px solid var(--border);
+}
+
+.custom-dropdown-empty {
+  padding: 12px 14px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
 /* ========== New Game Form ========== */
 .new-game-container {
   display: flex;

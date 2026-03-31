@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext.jsx';
+import CustomDropdown from './CustomDropdown.jsx';
 
 export default function PlayerModal({ player, allPlayers, onClose, isOwner }) {
   const { transferMoney, requestLoan, repayLoan, payBank, gameState } = useGame();
@@ -150,12 +151,12 @@ export default function PlayerModal({ player, allPlayers, onClose, isOwner }) {
             {action === 'transfer' && (
               <div className="form-section">
                 <label className="form-label">Recipient</label>
-                <select className="input select" value={recipientId} onChange={e => setRecipientId(e.target.value)}>
-                  <option value="">Select player...</option>
-                  {others.map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-                </select>
+                <CustomDropdown
+                  value={recipientId}
+                  onChange={val => setRecipientId(val)}
+                  options={others.map(p => ({ value: p.id, label: p.name }))}
+                  placeholder="Select player..."
+                />
               </div>
             )}
             <div className="form-section">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useGame } from '../context/GameContext.jsx';
+import CustomDropdown from './CustomDropdown.jsx';
 
 export default function BankModal({ onClose }) {
   const { gameState, takeLoan, bankPayPlayer, broadcastNotification, currentPlayerId, approveLoanRequest, rejectLoanRequest } = useGame();
@@ -159,15 +160,15 @@ export default function BankModal({ onClose }) {
           <form className="action-form" onSubmit={e => { e.preventDefault(); handleAction(); }}>
             <div className="form-section">
               <label className="form-label">Player</label>
-              <select className="input select" value={playerId} onChange={e => { setPlayerId(e.target.value); setAmount(''); }}>
-                <option value="">Select player...</option>
-                {players
+              <CustomDropdown
+                value={playerId}
+                onChange={val => { setPlayerId(val); setAmount(''); }}
+                options={players
                   .filter(p => p.id !== currentPlayerId)
                   .filter(p => action !== 'give_loan' || (p.maxLoan - p.loanTaken) > 0)
-                  .map(p => (
-                    <option key={p.id} value={p.id}>{p.name}</option>
-                  ))}
-              </select>
+                  .map(p => ({ value: p.id, label: p.name }))}
+                placeholder="Select player..."
+              />
             </div>
             <div className="form-section">
               <label className="form-label">Amount ($)</label>
