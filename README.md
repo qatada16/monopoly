@@ -5,7 +5,9 @@ A real-time digital banker for Monopoly board games. Eliminates paper money — 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Realtime_DB-FFCA28?logo=firebase&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
-![Vercel](https://img.shields.io/badge/Deployed-Vercel-000?logo=vercel&logoColor=white)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-000?logo=vercel&logoColor=white)](https://monopoly-qatada.vercel.app)
+
+**🌐 Live: [monopoly-qatada.vercel.app](https://monopoly-qatada.vercel.app)**
 
 ## Features
 
